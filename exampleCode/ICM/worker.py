@@ -6,7 +6,6 @@ from icm import ICM
 from memory import Memory
 from utils import plot_learning_curve
 
-
 def worker(name, input_shape, n_actions, global_agent, global_icm,
            optimizer, icm_optimizer, env_id, n_threads, icm=False):
     T_MAX = 20
@@ -27,17 +26,28 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
     t_steps, max_eps, episode, scores, avg_score = 0, 1000, 0, [], 0
 
     while episode < max_eps:
+
         obs = env.reset()[0]
+        #since Frozen Lake env gives a number as obs instead of a list
+        # we change it to a list here
+        obs = np.array([obs])
         hx = T.zeros(1, 256)
         score, done, ep_steps = 0, False, 0
         while not done:
-            state = T.tensor([obs], dtype=T.float)
-            action, value, log_prob, hx = local_agent(state, hx)
+            state = T.tensor(np.array([obs]), dtype=T.float)
+            action, value, log_prob, hx = local_agent.forward(state, hx)
             obs_, reward, done, truncated, info = env.step(action)
+
+            #since Frozen Lake env gives a number as obs instead of a list
+            # we change it to a list here
+            obs_ = np.array([obs_])
+
             t_steps += 1
             ep_steps += 1
             score += reward
-            reward = 0  # turn off extrinsic rewards
+
+            # since sparse reward in Frozen lake, we need extrinsic reward to learn as well
+            # reward = 0  # turn off extrinsic rewards
             memory.remember(obs, action, reward, obs_, value, log_prob)
             obs = obs_
             if ep_steps % T_MAX == 0 or done:
@@ -87,5 +97,5 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
         episode += 1
     if name == '1':
         x = [z for z in range(episode)]
-        fname = algo + '_CartPole_no_rewards.png'
+        fname = algo + '_FrozenLake_no_rewards.png'
         plot_learning_curve(x, scores, fname)

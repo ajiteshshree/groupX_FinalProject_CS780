@@ -4,7 +4,6 @@ from icm import ICM
 from shared_adam import SharedAdam
 from worker import worker
 
-
 class ParallelEnv:
     def __init__(self, env_id, input_shape, n_actions, icm, n_threads=8):
         names = [str(i) for i in range(1, n_threads+1)]
@@ -30,3 +29,4 @@ class ParallelEnv:
 
         [p.start() for p in self.ps]
         [p.join() for p in self.ps]
+

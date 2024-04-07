@@ -11,7 +11,7 @@ class ActorCritic(nn.Module):
         self.gamma = gamma
         self.tau = tau
 
-        self.input = nn.Linear(*input_dims, 256)
+        self.input = nn.Linear(input_dims[0], 256)
         self.dense = nn.Linear(256, 256)
 
         self.gru = nn.GRUCell(256, 256)
@@ -54,7 +54,7 @@ class ActorCritic(nn.Module):
         if r_i_t is not None:
             rewards += r_i_t.detach().numpy()
         returns = self.calc_R(done, rewards, values)
-        next_v = T.zeros(1, 1) if done else self.forward(T.tensor([new_states],
+        next_v = T.zeros(1, 1) if done else self.forward(T.tensor(np.array([new_states]),
                                          dtype=T.float), hx)[1]
 
         values.append(next_v.detach())

@@ -1,6 +1,7 @@
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 class ICM(nn.Module):
@@ -8,12 +9,12 @@ class ICM(nn.Module):
         super(ICM, self).__init__()
         self.alpha = alpha
         self.beta = beta
-        # hard coded for cartpole environment
-        self.inverse = nn.Linear(4*2, 256)
+        input = input_dims[0]
+        self.inverse = nn.Linear(input*2, 256)
         self.pi_logits = nn.Linear(256, n_actions)
 
-        self.dense1 = nn.Linear(4+1, 256)
-        self.new_state = nn.Linear(256, 4)
+        self.dense1 = nn.Linear(input+1, 256)
+        self.new_state = nn.Linear(256, input)
 
         device = T.device('cpu')
         self.to(device)
@@ -31,9 +32,9 @@ class ICM(nn.Module):
         return pi_logits, state_
 
     def calc_loss(self, state, new_state, action):
-        state = T.tensor(state, dtype=T.float)
-        action = T.tensor(action, dtype=T.float)
-        new_state = T.tensor(new_state, dtype=T.float)
+        state = T.tensor(np.array(state), dtype=T.float)
+        action = T.tensor(np.array(action), dtype=T.float)
+        new_state = T.tensor(np.array(new_state), dtype=T.float)
 
         pi_logits, state_ = self.forward(state, new_state, action)
 
