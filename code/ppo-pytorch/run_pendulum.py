@@ -10,9 +10,9 @@ from rewards import GeneralizedAdvantageEstimation, GeneralizedRewardEstimation
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    reporter = TensorBoardReporter()
+    reporter = TensorBoardReporter(logdir = 'tensorboard_runData/pendulum')
 
-    agent = PPO(MultiEnv('Pendulum-v0', 10, reporter),
+    agent = PPO(MultiEnv('Pendulum-v1', 10, reporter),
                 reporter=reporter,
                 normalize_state=True,
                 normalize_reward=True,
@@ -31,5 +31,5 @@ if __name__ == '__main__':
                 clip_grad_norm=0.5)
     agent.to(device, torch.float32, np.float32)
 
-    agent.learn(epochs=30, n_steps=200)
+    agent.learn(epochs=30, n_steps=200) #tried for 50, no significant effect
     agent.eval(n_steps=600, render=True)
