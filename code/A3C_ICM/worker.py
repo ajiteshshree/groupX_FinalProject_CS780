@@ -5,16 +5,17 @@ from actor_critic import ActorCritic
 from icm import ICM
 from memory import Memory
 from utils import plot_learning_curve
+import matplotlib.pyplot as plt
 
 def worker(name, input_shape, n_actions, global_agent, global_icm,
-           optimizer, icm_optimizer, env_id, n_threads, icm=False):
+           optimizer, icm_optimizer, env_id, n_threads, icm=False, run_optimized=False):
     T_MAX = 20
 
     local_agent = ActorCritic(input_shape, n_actions)
 
     if icm:
         local_icm = ICM(input_shape, n_actions)
-        algo = 'ICM'
+        algo = 'ICM+A3C'
     else:
         intrinsic_reward = T.zeros(1)
         algo = 'A3C'
@@ -30,7 +31,7 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
         obs = env.reset()[0]
         #since Frozen Lake env gives a number as obs instead of a list
         # we change it to a list here
-        obs = np.array([obs])
+        obs = np.array(obs)
         hx = T.zeros(1, 256)
         score, done, ep_steps = 0, False, 0
         while not done:
@@ -40,14 +41,19 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
 
             #since Frozen Lake env gives a number as obs instead of a list
             # we change it to a list here
-            obs_ = np.array([obs_])
+            obs_ = np.array(obs_)
 
             t_steps += 1
             ep_steps += 1
             score += reward
 
             # since sparse reward in Frozen lake, we need extrinsic reward to learn as well
-            # reward = 0  # turn off extrinsic rewards
+            reward = 0  # turn off extrinsic rewards
+            
+            # if reward == 1:
+            #     reward = 100
+
+            
             memory.remember(obs, action, reward, obs_, value, log_prob)
             obs = obs_
             if ep_steps % T_MAX == 0 or done:
@@ -88,14 +94,23 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
         if name == '1':
             scores.append(score)
             avg_score = np.mean(scores[-100:])
-            print('{} episode {} thread {} of {} steps {:.2f}M score {:.2f} '
-                  'intrinsic_reward {:.2f} avg score (100) {:.1f}'.format(
+            print('{} -> Episode {} -> Thread {} of {} -> Steps {:d} -> Score {:.2f} ->'
+                  'Intrinsic_reward {:.2f} -> Avg score (Last 100 timesteps) {:.1f}'.format(
                       algo, episode, name, n_threads,
-                      t_steps/1e6, score,
+                      t_steps, score,
                       T.sum(intrinsic_reward),
                       avg_score))
         episode += 1
     if name == '1':
         x = [z for z in range(episode)]
-        fname = algo + '_FrozenLake_no_rewards.png'
+        fname = algo + 'CartPole_no_External_rewards.png'
+        # print(scores)
         plot_learning_curve(x, scores, fname)
+        plt.plot(x, scores)
+        plt.title('Score Vs Episode')
+        plt.savefig('test')
+
+    if run_optimized:
+        optimized_agent = ActorCritic(input_shape, n_actions)
+        optimized_agent.load_state_dict(global_agent.state_dict())
+        # Run optimized algorithm using optimized_agent
