@@ -10,7 +10,7 @@ from rewards import GeneralizedAdvantageEstimation, GeneralizedRewardEstimation
 
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    reporter = TensorBoardReporter()
+    reporter = TensorBoardReporter(logdir = 'tensorboard_runData/mountainCar')
 
     agent = PPO(MultiEnv('MountainCar-v0', 16, reporter=reporter),
                 reporter=reporter,
