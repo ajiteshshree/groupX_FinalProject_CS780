@@ -1,0 +1,7 @@
+tensorboardX
+pytest
+pytest-mock
+torch
+numpy
+gym
+opencv-python #for cv2
