@@ -24,5 +24,5 @@ if __name__ == '__main__':
     for p in processes:
         p.join()
     
-    # print(p)
+    # print(p)  
     print("All processes have finished.")

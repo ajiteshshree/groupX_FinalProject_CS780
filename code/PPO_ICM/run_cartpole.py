@@ -3,6 +3,7 @@ import torch
 
 from agents import PPO
 from curiosity import NoCuriosity
+from curiosity import ICM, MlpICMModel
 from envs import MultiEnv
 from models import MLP
 from reporters import TensorBoardReporter

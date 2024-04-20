@@ -157,6 +157,7 @@ class ICM(Curiosity):
             actions.reshape(n * t, *actions.shape[2:]))
         next_states_latent, next_states_hat, _ = self.model(states, next_states, actions)
         intrinsic_reward = self.reward_scale / 2 * (next_states_hat - next_states_latent).norm(2, dim=-1).pow(2)
+
         intrinsic_reward = intrinsic_reward.cpu().detach().numpy().reshape(n, t)
         self.reporter.scalar('icm/reward',
                              intrinsic_reward.mean().item() if self.reporter.will_report('icm/reward') else 0)

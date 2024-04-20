@@ -33,8 +33,8 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
         # we change it to a list here
         obs = np.array(obs)
         hx = T.zeros(1, 256)
-        score, done, ep_steps = 0, False, 0
-        while not done:
+        score, done, truncated, ep_steps = 0, False, False, 0
+        while done == False:
             state = T.tensor(np.array([obs]), dtype=T.float)
             action, value, log_prob, hx = local_agent.forward(state, hx)
             obs_, reward, done, truncated, info = env.step(action)
@@ -103,7 +103,7 @@ def worker(name, input_shape, n_actions, global_agent, global_icm,
         episode += 1
     if name == '1':
         x = [z for z in range(episode)]
-        fname = algo + 'CartPole_no_External_rewards.png'
+        fname = algo + '_CartPole_no_External_rewards.png'
         # print(scores)
         plot_learning_curve(x, scores, fname)
         plt.plot(x, scores)
