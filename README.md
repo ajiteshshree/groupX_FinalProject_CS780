@@ -4,6 +4,9 @@ This Repository contains implementation of ICM( Intrinsic Curiosity reward ) mod
 ## Organization 
 The repo is divided into 3 parts corresponding to each algorithm implemented. PPO and A3C is a group of python files in a folder while DQN is a jupyer notebook. For running just clone the repo and execute the code normally.
 
+## Demo for PPO + ICM:
+1. Google Drive: https://drive.google.com/drive/folders/193MKIdXARZqCkVdSybdPXOQoEbfouXQB?usp=sharing
+
 ## References:
 1. A3C + ICM: https://youtu.be/O5Z-3q-J18I?si=bg4ytpGm63BtvltE
 2. PPO + ICM: https://github.com/adik993/ppo-pytorch
